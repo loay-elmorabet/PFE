@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Accueil - Football Analytics</title>
+  </head>
+  <body
+    class="bg-[#f4f5f7] text-[#1e293b] font-sans min-h-screen flex flex-col"
+  >
+    <header class="bg-[#0f172a] text-white">
+      <div
+        class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-3"></div>
+      </div>
+      <div class="h-1 bg-[#10b981]"></div>
+    </header>
+
+    <main class="flex-1 flex items-center">
+      <div class="max-w-6xl w-full mx-auto px-6 py-16">
+        <div class="text-center mb-14">
+          <h1
+            class="text-3xl md:text-5xl font-black tracking-tight text-[#0f172a] mb-4"
+          >
+            Application de suivie de performance et analyse de données
+          </h1>
+          <p class="text-gray-500 text-lg">Choisissez le mode</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <button
+            onclick="naviguerVersStats()"
+            class="group bg-white p-10 text-left border-t-4 border-[#10b981] shadow-sm hover:shadow-lg transition-shadow duration-300"
+          >
+            <div
+              class="w-14 h-14 flex items-center justify-center bg-[#10b981]/10 text-[#10b981] mb-6 group-hover:bg-[#10b981] group-hover:text-white transition-colors duration-300"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-7 w-7"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </div>
+            <span class="block text-xl font-extrabold text-[#0f172a] mb-2">
+              Statistiques
+            </span>
+            <span class="block text-sm text-gray-400">
+              Fiche individuelle détaillée d'un joueur
+            </span>
+          </button>
+
+          <button
+            onclick="naviguerVersComparaison()"
+            class="group bg-white p-10 text-left border-t-4 border-[#10b981] shadow-sm hover:shadow-lg transition-shadow duration-300"
+          >
+            <div
+              class="w-14 h-14 flex items-center justify-center bg-[#10b981]/10 text-[#10b981] mb-6 group-hover:bg-[#10b981] group-hover:text-white transition-colors duration-300"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-7 w-7"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+            </div>
+            <span class="block text-xl font-extrabold text-[#0f172a] mb-2">
+              Duel
+            </span>
+            <span class="block text-sm text-gray-400">
+              Comparaison directe entre deux joueurs
+            </span>
+          </button>
+        </div>
+      </div>
+    </main>
+    <script>
+      function naviguerVersStats() {
+        window.location.href = "/joueur";
+      }
+
+      function naviguerVersComparaison() {
+        window.location.href = "/duel";
+      }
+    </script>
+  </body>
+</html>

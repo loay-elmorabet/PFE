@@ -133,9 +133,9 @@ def get_player_stats(s,league_id,team_id,player_id):
         duelsWon=secure(firstStatistic['duels']['won'])
         gamesAppaer=secure(firstStatistic['games']['appearences'])
         IC=diviser_safe(keyPasses,gamesAppaer)#Indice de création
-        ICG=accuracyPasses*keyPasses #Indice de contrôle du jeu
+        ICG=diviser_safe((accuracyPasses/100)*keyPasses,gamesAppaer) #Indice de contrôle du jeu
         IE=diviser_safe((keyPasses+tacklesInter),gamesAppaer)# Indice d’équilibre offensive et défensive
-        IAG=diviser_safe((duelsWon+totalPasses),gamesAppaer) # Indice d’équilibre offensive et défensive
+        IAG=diviser_safe((duelsWon+totalPasses),gamesAppaer) # Indice Activité globale
         IGM=((ICG/100)*0.3 +IC*0.25 + IE*0.2 + IAG*0.25) #Indice global milieu
         stats_base={
             "goals_total":goals,
@@ -194,7 +194,7 @@ def get_player_stats(s,league_id,team_id,player_id):
         IGD=(ISD*0.35 + IDD*0.25 + IDI*0.2 + IPD*0.2) #Indice globale défenseur 
         stats_base={
             "tackles_total":tacklesTotal,
-            "passes_interception":tacklesInter,
+            "tackles_interception":tacklesInter,
             "fouls_committed":foulsComm,
             "passes_key":keyPasses,
             "duels_won":duelsWon,

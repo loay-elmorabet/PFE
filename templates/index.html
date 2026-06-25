@@ -1,33 +1,184 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Sélection du Joueur - Football Analytics</title>
   </head>
-  <body>
-    <form method="GET">
-      <select name="season" id="saison-select">
-        <option value="">choisir une année</option>
-        <option value="2022">2022</option>
-        <option value="2023">2023</option>
-        <option value="2024">2024</option>
-      </select>
-      <select name="league" id="ligue" disabled>
-        <option value="">choisir une ligue</option>
-      </select>
-      <select name="team" id="equipe" disabled></select>
-      <select name="player" id="joueur" disabled></select>
-      <button type="submit">afficher les statistiques</button>
-    </form>
-    <!-- {% if ligues %}
-    <h3>Ligues disponibles pour la saison {{ saison }} :</h3>
-    <ul>
-        {% for id_ligue, nom_ligue in ligues %}
-            <li><strong>{{ nom_ligue }}</strong></li>
-        {% endfor %}
-    </ul> -->
-    <!-- {% endif %} -->
+
+  <body
+    class="bg-[#f4f5f7] text-[#1e293b] font-sans min-h-screen flex items-center justify-center p-6"
+  >
+    <div
+      class="max-w-xl w-full bg-white p-8 md:p-10 rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+    >
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-black tracking-tight text-[#0f172a]">
+          Sélection du Joueur
+        </h1>
+      </div>
+
+      <form method="GET" action="{{ url_for('profil') }}" class="space-y-5">
+        <div class="space-y-1.5">
+          <label
+            for="saison-select"
+            class="text-xs font-bold uppercase tracking-wider text-gray-400 block pl-1"
+          >
+            Saison
+          </label>
+          <div class="relative">
+            <select
+              name="season"
+              id="saison-select"
+              class="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-[#10b981] focus:ring-2 focus:ring-[#10b981]/10 text-sm font-semibold rounded-xl p-3.5 transition-all outline-none appearance-none cursor-pointer text-[#334155]"
+            >
+              <option value="" class="font-sans text-gray-400">
+                Choisir une année
+              </option>
+              <option value="2022">2022</option>
+              <option value="2023">2023</option>
+              <option value="2024">2024</option>
+            </select>
+            <div
+              class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label
+            for="ligue"
+            class="text-xs font-bold uppercase tracking-wider text-gray-400 block pl-1"
+          >
+            Ligue
+          </label>
+          <div class="relative">
+            <select
+              name="league"
+              id="ligue"
+              disabled
+              class="w-full bg-gray-50/30 border border-gray-200 text-sm font-semibold rounded-xl p-3.5 outline-none appearance-none transition-all cursor-pointer text-[#334155] disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-[#10b981] focus:ring-2 focus:ring-[#10b981]/10"
+            >
+              <option value="">Choisir une ligue</option>
+            </select>
+            <div
+              class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label
+            for="equipe"
+            class="text-xs font-bold uppercase tracking-wider text-gray-400 block pl-1"
+          >
+            Équipe
+          </label>
+          <div class="relative">
+            <select
+              name="team"
+              id="equipe"
+              disabled
+              class="w-full bg-gray-50/30 border border-gray-200 text-sm font-semibold rounded-xl p-3.5 outline-none appearance-none transition-all cursor-pointer text-[#334155] disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-[#10b981] focus:ring-2 focus:ring-[#10b981]/10"
+            ></select>
+            <div
+              class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label
+            for="joueur"
+            class="text-xs font-bold uppercase tracking-wider text-gray-400 block pl-1"
+          >
+            Joueur
+          </label>
+          <div class="relative">
+            <select
+              name="player"
+              id="joueur"
+              disabled
+              class="w-full bg-gray-50/30 border border-gray-200 text-sm font-semibold rounded-xl p-3.5 outline-none appearance-none transition-all cursor-pointer text-[#334155] disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed focus:border-[#10b981] focus:ring-2 focus:ring-[#10b981]/10"
+            ></select>
+            <div
+              class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2.5"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 flex flex-col sm:flex-row gap-3">
+          <button
+            type="submit"
+            class="w-full sm:w-2/3 order-1 sm:order-2 py-3.5 px-4 bg-[#10b981] hover:bg-[#0f9f6e] text-white font-extrabold text-sm rounded-xl transition-all duration-300 shadow-sm hover:shadow-[0_10px_20px_rgba(16,185,129,0.15)] text-center uppercase tracking-wide"
+          >
+            Afficher les statistiques
+          </button>
+        </div>
+      </form>
+    </div>
+
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
   </body>
 </html>

@@ -1,0 +1,911 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>Confrontation - Football Analytics</title>
+  </head>
+
+  <body class="bg-[#f4f5f7] text-[#1e293b] font-sans min-h-screen p-4 md:p-8">
+    <div
+      data-html2canvas-ignore="true"
+      class="max-w-5xl mx-auto mb-4 flex justify-end gap-3"
+    >
+      <button
+        onclick="exporterPNG()"
+        class="inline-flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-white bg-white hover:bg-slate-800 border border-slate-200 hover:border-slate-800 px-4 py-3 rounded-xl transition-all shadow-sm"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 002-2H4a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+        Télécharger Image (PNG)
+      </button>
+      <button
+        onclick="exporterPDF()"
+        class="inline-flex items-center gap-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 border border-transparent px-4 py-3 rounded-xl transition-all shadow-md"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+        Télécharger Rapport (PDF)
+      </button>
+    </div>
+
+    <div
+      id="capture-zone"
+      class="max-w-5xl mx-auto bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 rounded-[24px] p-6 md:p-8"
+    >
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-black tracking-tight text-[#0f172a] mt-1">
+          CONFRONTATION
+        </h1>
+      </div>
+
+      <div
+        class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center text-center mb-10 bg-gray-50/50 p-4 rounded-2xl border border-gray-100"
+      >
+        <div class="p-4">
+          <h2 class="text-2xl font-black text-gray-900 tracking-tight">
+            {{ stats1.nom }}
+          </h2>
+          <p class="text-xs text-[#10b981] font-semibold mt-1">
+            {{ stats1.equipe }}
+          </p>
+        </div>
+
+        <div class="flex justify-center">
+          <span
+            class="w-12 h-12 rounded-full bg-white flex items-center justify-center font-black text-xs text-gray-400 tracking-widest border border-gray-200/60 shadow-sm"
+          >
+            VS
+          </span>
+        </div>
+
+        <div class="p-4">
+          <h2 class="text-2xl font-black text-gray-900 tracking-tight">
+            {{ stats2.nom }}
+          </h2>
+          <p class="text-xs text-slate-600 font-semibold mt-1">
+            {{ stats2.equipe }}
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-10">
+        <h3
+          class="text-base font-bold text-[#0f172a] mb-4 tracking-tight flex items-center gap-2"
+        >
+          <span class="w-1.5 h-4 rounded-full bg-[#10b981]"></span>
+          Statistiques de Base
+        </h3>
+        <div class="overflow-hidden rounded-xl border border-gray-100">
+          <table class="w-full text-sm text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-gray-50 text-gray-400 uppercase text-[10px] tracking-wider font-bold border-b border-gray-100"
+              >
+                <th class="p-4 w-2/5 text-right font-black text-gray-700">
+                  {{ stats1.nom }}
+                </th>
+                <th
+                  class="p-4 text-center w-1/5 bg-gray-100/70 text-gray-900 font-extrabold"
+                >
+                  Critère
+                </th>
+                <th class="p-4 w-2/5 text-left font-black text-gray-700">
+                  {{ stats2.nom }}
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50 font-medium text-gray-600">
+              {% if stats1.poste == 'Attacker' %}
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-lg text-gray-900 font-bold">
+                  {{ stats1.statistiques.goals_total }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Buts Totaux
+                </td>
+                <td class="p-4 text-left text-lg text-gray-900 font-bold">
+                  {{ stats2.statistiques.goals_total }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right">
+                  {{ stats1.statistiques.shots_on }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Tirs Cadrés
+                </td>
+                <td class="p-4 text-left">
+                  {{ stats2.statistiques.shots_on }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right">
+                  {{ stats1.statistiques.shots_total }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Tirs Totaux
+                </td>
+                <td class="p-4 text-left">
+                  {{ stats2.statistiques.shots_total }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right">
+                  {{ stats1.statistiques.dribbles_success }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Dribbles Réussis
+                </td>
+                <td class="p-4 text-left">
+                  {{ stats2.statistiques.dribbles_success }}
+                </td>
+              </tr>
+              {% endif %} {% if stats1.poste == 'Midfielder' %}
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-lg text-gray-900 font-bold">
+                  {{ stats1.statistiques.goals_total }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Buts Totaux
+                </td>
+                <td class="p-4 text-left text-lg text-gray-900 font-bold">
+                  {{ stats2.statistiques.goals_total }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right">
+                  {{ stats1.statistiques.passes_accuracy }}%
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Précision Passes
+                </td>
+                <td class="p-4 text-left">
+                  {{ stats2.statistiques.passes_accuracy }}%
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right">
+                  {{ stats1.statistiques.passes_total }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Total Passes
+                </td>
+                <td class="p-4 text-left">
+                  {{ stats2.statistiques.passes_total }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right">
+                  {{ stats1.statistiques.passes_key }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Passes Clés
+                </td>
+                <td class="p-4 text-left">
+                  {{ stats2.statistiques.passes_key }}
+                </td>
+              </tr>
+              {% endif %} {% if stats1.poste == 'Defender' %}
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-lg text-gray-900 font-bold">
+                  {{ stats1.statistiques.tackles_total }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Tacles Totaux
+                </td>
+                <td class="p-4 text-left text-lg text-gray-900 font-bold">
+                  {{ stats2.statistiques.tackles_total }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right">
+                  {{ stats1.statistiques.tackles_interception }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Interceptions
+                </td>
+                <td class="p-4 text-left">
+                  {{ stats2.statistiques.tackles_interception }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-red-500">
+                  {{ stats1.statistiques.fouls_committed }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Fautes Commises
+                </td>
+                <td class="p-4 text-left text-red-500">
+                  {{ stats2.statistiques.fouls_committed }}
+                </td>
+              </tr>
+              {% endif %} {% if stats1.poste == 'Goalkeeper' %}
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-lg text-gray-900 font-bold">
+                  {{ stats1.statistiques.goals_saves }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Arrêts
+                </td>
+                <td class="p-4 text-left text-lg text-gray-900 font-bold">
+                  {{ stats2.statistiques.goals_saves }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-red-500">
+                  {{ stats1.statistiques.goals_conceded }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Buts Encaissés
+                </td>
+                <td class="p-4 text-left text-red-500">
+                  {{ stats2.statistiques.goals_conceded }}
+                </td>
+              </tr>
+              {% endif %}
+
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right">
+                  {{ stats1.statistiques.duels_won }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-[11px] text-gray-400 uppercase font-bold tracking-wide"
+                >
+                  Duels Gagnés
+                </td>
+                <td class="p-4 text-left">
+                  {{ stats2.statistiques.duels_won }}
+                </td>
+              </tr>
+              <tr class="bg-[#10b981]/5 font-bold text-gray-900">
+                <td class="p-4 text-right text-xl text-[#10b981] font-black">
+                  {{ stats1.statistiques.game_rating }}
+                </td>
+                <td
+                  class="p-4 text-center bg-[#10b981]/10 text-xs text-[#10b981] uppercase tracking-widest font-black"
+                >
+                  Note Globale
+                </td>
+                <td class="p-4 text-left text-xl text-[#10b981] font-black">
+                  {{ stats2.statistiques.game_rating }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mb-10">
+        <h3
+          class="text-base font-bold text-[#0f172a] mb-4 tracking-tight flex items-center gap-2"
+        >
+          <span class="w-1.5 h-4 rounded-full bg-slate-800"></span>
+          Indices de Performance
+        </h3>
+        <div class="overflow-hidden rounded-xl border border-gray-100">
+          <table class="w-full text-sm text-left border-collapse">
+            <tbody class="divide-y divide-gray-50 font-medium text-gray-600">
+              {% if stats1.poste == 'Attacker' %}
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IDO }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Domination Offensive (IDO)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IDO }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IEO }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Efficacité Offensive (IEO)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IEO }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IOPM }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Impact par Match (IOPM)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IOPM }}
+                </td>
+              </tr>
+              <tr class="bg-[#10b981]/5 font-black">
+                <td class="p-4 text-right text-lg text-[#10b981]">
+                  {{ stats1.indices_performance.IGA }}
+                </td>
+                <td
+                  class="p-4 text-center bg-[#10b981]/10 text-xs text-[#10b981] uppercase tracking-wider"
+                >
+                  Score Global Attaquant (IGA)
+                </td>
+                <td class="p-4 text-left text-lg text-[#10b981]">
+                  {{ stats2.indices_performance.IGA }}
+                </td>
+              </tr>
+              {% endif %} {% if stats1.poste == 'Midfielder' %}
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IC }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Indice de Création (IC)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IC }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.ICG }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Contrôle du Jeu (ICG)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.ICG }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IE }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Équilibre Off / Déf (IE)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IE }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IAG }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Activité Globale (IAG)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IAG }}
+                </td>
+              </tr>
+              <tr class="bg-[#10b981]/5 font-black">
+                <td class="p-4 text-right text-lg text-[#10b981]">
+                  {{ stats1.indices_performance.IGM }}
+                </td>
+                <td
+                  class="p-4 text-center bg-[#10b981]/10 text-xs text-[#10b981] uppercase tracking-wider"
+                >
+                  Score Global Milieu (IGM)
+                </td>
+                <td class="p-4 text-left text-lg text-[#10b981]">
+                  {{ stats2.indices_performance.IGM }}
+                </td>
+              </tr>
+              {% endif %} {% if stats1.poste == 'Defender' %}
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.ISD }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Solidité Défensive (ISD)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.ISD }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IDI }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Discipline Inversée (IDI)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IDI }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IDD }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Domination Défensive (IDD)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IDD }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IPD }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Pression Défensive (IPD)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IPD }}
+                </td>
+              </tr>
+              <tr class="bg-[#10b981]/5 font-black">
+                <td class="p-4 text-right text-lg text-[#10b981]">
+                  {{ stats1.indices_performance.IGD }}
+                </td>
+                <td
+                  class="p-4 text-center bg-[#10b981]/10 text-xs text-[#10b981] uppercase tracking-wider"
+                >
+                  Score Global Défenseur (IGD)
+                </td>
+                <td class="p-4 text-left text-lg text-[#10b981]">
+                  {{ stats2.indices_performance.IGD }}
+                </td>
+              </tr>
+              {% endif %} {% if stats1.poste == 'Goalkeeper' %}
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IFI }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Indice de Fiabilité (IFI)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IFI }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IR }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Indice de Résistance (IR)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IR }}
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50/30 transition-colors">
+                <td class="p-4 text-right text-gray-900 font-bold">
+                  {{ stats1.indices_performance.IS }}
+                </td>
+                <td
+                  class="p-4 text-center bg-gray-50 text-xs text-slate-500 font-bold uppercase"
+                >
+                  Indice de Sécurité (IS)
+                </td>
+                <td class="p-4 text-left text-gray-900 font-bold">
+                  {{ stats2.indices_performance.IS }}
+                </td>
+              </tr>
+              <tr class="bg-[#10b981]/5 font-black">
+                <td class="p-4 text-right text-lg text-[#10b981]">
+                  {{ stats1.indices_performance.IGG }}
+                </td>
+                <td
+                  class="p-4 text-center bg-[#10b981]/10 text-xs text-[#10b981] uppercase tracking-wider"
+                >
+                  Score Global Gardien (IGG)
+                </td>
+                <td class="p-4 text-left text-lg text-[#10b981]">
+                  {{ stats2.indices_performance.IGG }}
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+        <div
+          class="bg-white p-5 rounded-[20px] border border-gray-100 shadow-sm"
+        >
+          <h4
+            class="text-xs font-bold text-gray-400 uppercase tracking-wider text-center mb-4"
+          >
+            Confrontation Directe
+          </h4>
+          <div class="w-full h-72">
+            <canvas id="miroirChart"></canvas>
+          </div>
+        </div>
+
+        <div
+          class="bg-white p-5 rounded-[20px] border border-gray-100 shadow-sm"
+        >
+          <h4
+            class="text-xs font-bold text-gray-400 uppercase tracking-wider text-center mb-4"
+          >
+            Distribution des Indices de Performance
+          </h4>
+          <div class="w-full h-72">
+            <canvas id="areaChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function preparerCanvasPourCapture() {
+        document.querySelectorAll("canvas").forEach((canvas) => {
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(canvas, 0, 0);
+          }
+        });
+      }
+
+      function exporterPNG() {
+        preparerCanvasPourCapture();
+        const element = document.getElementById("capture-zone");
+        html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          logging: false,
+        }).then((canvas) => {
+          const link = document.createElement("a");
+          link.download = `Duel_${"{{ stats1.nom }}"}_VS_${"{{ stats2.nom }}"}.png`;
+          link.href = canvas.toDataURL("image/png");
+          link.click();
+        });
+      }
+
+      function exporterPDF() {
+        preparerCanvasPourCapture();
+        window.jsPDF = window.jspdf.jsPDF;
+        const element = document.getElementById("capture-zone");
+        html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          logging: false,
+        }).then((canvas) => {
+          const imgData = canvas.toDataURL("image/png");
+          const pdf = new jsPDF("p", "mm", "a4");
+          const imgWidth = 210;
+          const pageHeight = 295;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          let heightLeft = imgHeight;
+          let position = 0;
+
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+          pdf.save(
+            `Rapport_Duel_${"{{ stats1.nom }}"}_VS_${"{{ stats2.nom }}"}.pdf`,
+          );
+        });
+      }
+    </script>
+
+    <script>
+      const nomJ1 = "{{ stats1.nom }}";
+      const nomJ2 = "{{ stats2.nom }}";
+      const poste = "{{ stats1.poste }}";
+
+      let labelsStats = [],
+        donneesJ1_Stats = [],
+        donneesJ2_Stats = [];
+      let labelsIndices = [],
+        donneesJ1_Indices = [],
+        donneesJ2_Indices = [];
+
+      if (poste === "Attacker") {
+        labelsStats = [
+          "Buts Totaux",
+          "Tirs Cadrés",
+          "Tirs Totaux",
+          "Duels Gagnés (x0.1)",
+        ];
+        donneesJ1_Stats = [
+          -parseFloat("{{ stats1.statistiques.goals_total or 0 }}"),
+          -parseFloat("{{ stats1.statistiques.shots_on or 0 }}"),
+          -parseFloat("{{ stats1.statistiques.shots_total or 0 }}"),
+          -(parseFloat("{{ stats1.statistiques.duels_won or 0 }}") * 0.1),
+        ];
+        donneesJ2_Stats = [
+          parseFloat("{{ stats2.statistiques.goals_total or 0 }}"),
+          parseFloat("{{ stats2.statistiques.shots_on or 0 }}"),
+          parseFloat("{{ stats2.statistiques.shots_total or 0 }}"),
+          parseFloat("{{ stats2.statistiques.duels_won or 0 }}") * 0.1,
+        ];
+
+        labelsIndices = ["IDO", "IEO", "IOPM", "IGA"];
+        donneesJ1_Indices = [
+          parseFloat("{{ stats1.indices_performance.IDO or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IEO or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IOPM or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IGA or 0 }}"),
+        ];
+        donneesJ2_Indices = [
+          parseFloat("{{ stats2.indices_performance.IDO or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IEO or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IOPM or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IGA or 0 }}"),
+        ];
+      } else if (poste === "Midfielder") {
+        labelsStats = [
+          "Buts Totaux",
+          "Total Passes / 50",
+          "Passes Clés",
+          "Duels Gagnés (x0.1)",
+        ];
+        donneesJ1_Stats = [
+          -parseFloat("{{ stats1.statistiques.goals_total or 0 }}"),
+          -(parseFloat("{{ stats1.statistiques.passes_total or 0 }}") / 50),
+          -parseFloat("{{ stats1.statistiques.passes_key or 0 }}"),
+          -(parseFloat("{{ stats1.statistiques.duels_won or 0 }}") * 0.1),
+        ];
+        donneesJ2_Stats = [
+          parseFloat("{{ stats2.statistiques.goals_total or 0 }}"),
+          parseFloat("{{ stats2.statistiques.passes_total or 0 }}") / 50,
+          parseFloat("{{ stats2.statistiques.passes_key or 0 }}"),
+          parseFloat("{{ stats2.statistiques.duels_won or 0 }}") * 0.1,
+        ];
+
+        labelsIndices = ["IC", "ICG", "IE", "IAG", "IGM"];
+        donneesJ1_Indices = [
+          parseFloat("{{ stats1.indices_performance.IC or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.ICG or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IE or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IAG or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IGM or 0 }}"),
+        ];
+        donneesJ2_Indices = [
+          parseFloat("{{ stats2.indices_performance.IC or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.ICG or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IE or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IAG or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IGM or 0 }}"),
+        ];
+      } else if (poste === "Defender") {
+        labelsStats = [
+          "Tacles Totaux",
+          "Interceptions",
+          "Fautes Commises",
+          "Duels Gagnés (x0.1)",
+        ];
+        donneesJ1_Stats = [
+          -parseFloat("{{ stats1.statistiques.tackles_total or 0 }}"),
+          -parseFloat("{{ stats1.statistiques.tackles_interception or 0 }}"),
+          -parseFloat("{{ stats1.statistiques.fouls_committed or 0 }}"),
+          -(parseFloat("{{ stats1.statistiques.duels_won or 0 }}") * 0.1),
+        ];
+        donneesJ2_Stats = [
+          parseFloat("{{ stats2.statistiques.tackles_total or 0 }}"),
+          parseFloat("{{ stats2.statistiques.tackles_interception or 0 }}"),
+          parseFloat("{{ stats2.statistiques.fouls_committed or 0 }}"),
+          parseFloat("{{ stats2.statistiques.duels_won or 0 }}") * 0.1,
+        ];
+
+        labelsIndices = ["ISD", "IDI", "IDD", "IPD", "IGD"];
+        donneesJ1_Indices = [
+          parseFloat("{{ stats1.indices_performance.ISD or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IDI or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IDD or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IPD or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IGD or 0 }}"),
+        ];
+        donneesJ2_Indices = [
+          parseFloat("{{ stats2.indices_performance.ISD or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IDI or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IDD or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IPD or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IGD or 0 }}"),
+        ];
+      } else if (poste === "Goalkeeper") {
+        labelsStats = ["Arrêts", "Buts Encaissés", "Duels Gagnés"];
+        donneesJ1_Stats = [
+          -parseFloat("{{ stats1.statistiques.goals_saves or 0 }}"),
+          -parseFloat("{{ stats1.statistiques.goals_conceded or 0 }}"),
+          -parseFloat("{{ stats1.statistiques.duels_won or 0 }}"),
+        ];
+        donneesJ2_Stats = [
+          parseFloat("{{ stats2.statistiques.goals_saves or 0 }}"),
+          parseFloat("{{ stats2.statistiques.goals_conceded or 0 }}"),
+          parseFloat("{{ stats2.statistiques.duels_won or 0 }}"),
+        ];
+
+        labelsIndices = ["IFI", "IR", "IS", "IGG"];
+        donneesJ1_Indices = [
+          parseFloat("{{ stats1.indices_performance.IFI or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IR or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IS or 0 }}"),
+          parseFloat("{{ stats1.indices_performance.IGG or 0 }}"),
+        ];
+        donneesJ2_Indices = [
+          parseFloat("{{ stats2.indices_performance.IFI or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IR or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IS or 0 }}"),
+          parseFloat("{{ stats2.indices_performance.IGG or 0 }}"),
+        ];
+      }
+
+      const colorJ1 = "#10b981";
+      const colorJ2 = "#1e293b";
+      const areaJ1 = "rgba(16, 185, 129, 0.15)";
+      const areaJ2 = "rgba(30, 41, 59, 0.15)";
+
+      const ctxMiroir = document.getElementById("miroirChart");
+      if (ctxMiroir) {
+        new Chart(ctxMiroir, {
+          type: "bar",
+          data: {
+            labels: labelsStats,
+            datasets: [
+              {
+                label: nomJ1,
+                data: donneesJ1_Stats,
+                backgroundColor: colorJ1,
+                borderRadius: 4,
+              },
+              {
+                label: nomJ2,
+                data: donneesJ2_Stats,
+                backgroundColor: colorJ2,
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: {
+                ticks: { callback: (v) => Math.abs(v), font: { size: 10 } },
+                grid: { color: "#f1f5f9" },
+              },
+              y: {
+                ticks: { font: { size: 11, weight: "bold" } },
+                grid: { display: false },
+              },
+            },
+          },
+        });
+      }
+
+      const ctxArea = document.getElementById("areaChart");
+      if (ctxArea) {
+        new Chart(ctxArea, {
+          type: "line",
+          data: {
+            labels: labelsIndices,
+            datasets: [
+              {
+                label: nomJ1,
+                data: donneesJ1_Indices,
+                borderColor: colorJ1,
+                backgroundColor: areaJ1,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 3,
+              },
+              {
+                label: nomJ2,
+                data: donneesJ2_Indices,
+                borderColor: colorJ2,
+                backgroundColor: areaJ2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 3,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: { font: { size: 11, weight: "bold" } },
+              },
+            },
+            scales: {
+              y: { beginAtZero: true, grid: { color: "#f1f5f9" } },
+              x: {
+                grid: { color: "#f1f5f9" },
+                ticks: { font: { size: 11, weight: "bold" } },
+              },
+            },
+          },
+        });
+      }
+    </script>
+  </body>
+</html>
